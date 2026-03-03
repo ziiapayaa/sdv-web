@@ -225,7 +225,7 @@ export async function POST(req: Request) {
     const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || 'SB-Mid-client-DUMMY';
     
     const snap = new midtransClient.Snap({
-      isProduction: serverKey.startsWith('Mid-server-'),
+      isProduction: false, // FORCE SANDBOX
       serverKey: serverKey,
       clientKey: clientKey
     });
