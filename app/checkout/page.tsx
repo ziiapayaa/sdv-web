@@ -117,6 +117,7 @@ export default function CheckoutPage() {
 
   if (!mounted || items.length === 0) return null;
 
+  const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || 'SB-Mid-client-DUMMY';
   const snapScriptUrl = 'https://app.sandbox.midtrans.com/snap/snap.js'; // FORCE SANDBOX
 
   return (
