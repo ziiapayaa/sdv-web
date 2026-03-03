@@ -88,20 +88,32 @@ export default function CheckoutPage() {
 
       window.snap.pay(data.snapToken, {
         onSuccess: function() {
-          clearCart();
+          if (session?.user?.email) {
+            sessionStorage.setItem("sdv-checkout-email", session.user.email);
+          }
           router.push(`/checkout/success?order_id=${data.orderId}`);
+          setTimeout(clearCart, 500);
         },
         onPending: function() {
-          clearCart(); // Clearing cart for pending (like bank transfer), they can pay later
+          if (session?.user?.email) {
+            sessionStorage.setItem("sdv-checkout-email", session.user.email);
+          }
           router.push(`/checkout/success?order_id=${data.orderId}`);
+          setTimeout(clearCart, 500);
         },
         onError: function(result) {
           console.error("Payment error:", result);
+          if (session?.user?.email) {
+            sessionStorage.setItem("sdv-checkout-email", session.user.email);
+          }
           // Don't clear cart on error so they can retry
           router.push(`/checkout/failed?order_id=${data.orderId}`);
         },
         onClose: function() {
           setIsLoading(false);
+          if (session?.user?.email) {
+            sessionStorage.setItem("sdv-checkout-email", session.user.email);
+          }
           // Force them to the pending page securely instead of staying on checkout with a dirty cart state
           router.push(`/checkout/success?order_id=${data.orderId}`);
         }
