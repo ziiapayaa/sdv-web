@@ -3,8 +3,8 @@ import { Footer } from "@/components/layout/Footer";
 import { CollectionsGrid } from "./CollectionsGrid";
 import { prisma } from "@/lib/prisma";
 
-// Revalidate every hour or make it dynamic if you want real-time updates
-export const revalidate = 3600;
+// Prevent static generation database connection bugs on Vercel
+export const dynamic = "force-dynamic";
 
 export default async function Collections() {
   // Fetch published products from the database

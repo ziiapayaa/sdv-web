@@ -1,9 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { HomeClient } from "./HomeClient";
 
-const prisma = new PrismaClient();
-
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const settings = await prisma.homeSettings.findFirst();
