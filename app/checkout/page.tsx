@@ -117,7 +117,10 @@ export default function CheckoutPage() {
 
   if (!mounted || items.length === 0) return null;
 
-  const snapScriptUrl = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY?.includes('production') 
+  const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || 'SB-Mid-client-DUMMY';
+  const isProdKey = clientKey.startsWith('Mid-client-');
+  
+  const snapScriptUrl = isProdKey
     ? 'https://app.midtrans.com/snap/snap.js'
     : 'https://app.sandbox.midtrans.com/snap/snap.js';
 
@@ -127,7 +130,7 @@ export default function CheckoutPage() {
       <Script 
         src={snapScriptUrl}
         strategy="afterInteractive"
-        data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || 'SB-Mid-client-DUMMY'}
+        data-client-key={clientKey}
       />
       <main className="min-h-screen pt-28 pb-12 flex flex-col items-center bg-[#ffffff] text-[#000000]">
         <motion.div 
