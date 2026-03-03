@@ -24,10 +24,13 @@ export async function POST(
       return NextResponse.json({ error: "Email is required for verification" }, { status: 400 });
     }
 
+    // Clean up input in case they paste the '#' character
+    const cleanOrderId = orderId.replace(/^#/, '').toLowerCase();
+
     // SECURITY: Ownership check — only return order if email matches
     const order = await prisma.order.findFirst({
       where: { 
-        id: orderId,
+        id: { startsWith: cleanOrderId }, // Allow short ID from email
         email: email
       },
       include: {
