@@ -19,6 +19,8 @@
 # misc
 .DS_Store
 *.pem
+*.txt
+*.sql
 
 # debug
 npm-debug.log*
@@ -26,7 +28,9 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
+.env
+.env.*
+!.env.example
 
 # vercel
 .vercel
@@ -34,3 +38,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma

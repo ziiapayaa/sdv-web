@@ -1,0 +1,174 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum DropStatus {
+  UPCOMING
+  LIVE
+  SOLD_OUT
+  ENDED
+}
+
+enum Currency {
+  IDR
+  USD
+}
+
+enum OrderLifecycle {
+  RESERVED
+  PAID
+  SHIPPED
+  COMPLETED
+  FAILED
+  EXPIRED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  MIDTRANS
+  STRIPE
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  FAILED
+  REFUNDED
+  EXPIRED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(CUSTOMER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  orders    Order[]
+}
+
+model Product {
+  id           String           @id @default(cuid())
+  title        String
+  slug         String           @unique
+  description  String
+  price        Int              // Base currency IDR
+  published    Boolean          @default(false)
+  collectionId String?
+  collection   Collection?      @relation(fields: [collectionId], references: [id])
+  isLimited    Boolean          @default(true)
+  dropDate     DateTime?
+  dropStatus   DropStatus       @default(UPCOMING)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  images       ProductImage[]
+  orders       Order[]
+  variants     ProductVariant[]
+}
+
+model ProductVariant {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size      String  // S, M, L, XL, etc.
+  stock     Int     @default(0)
+
+  @@unique([productId, size])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  url       String
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  isPrimary Boolean  @default(false)
+}
+
+model Collection {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  description String?
+  published   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products    Product[]
+}
+
+model Order {
+  id                   String          @id @default(cuid())
+  userId               String?
+  user                 User?           @relation(fields: [userId], references: [id])
+  email                String
+  name                 String
+  phone                String
+  address              String
+  
+  productId            String          
+  product              Product         @relation(fields: [productId], references: [id])
+  quantity             Int
+  size                 String?
+
+  subtotalAmount       Int
+  discountAmount       Int             @default(0)
+  shippingAmount       Int             @default(0)
+  totalAmount          Int
+  currency             Currency
+  exchangeRateSnapshot Decimal         @default(1)
+  
+  lifecycle            OrderLifecycle  @default(RESERVED)
+  paymentProvider      PaymentProvider
+  paymentStatus        PaymentStatus   @default(UNPAID)
+  paymentIntentId      String?
+  paymentTransactionId String?         @unique
+  trackingNumber       String?
+  reservationExpiresAt DateTime?
+
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  @@index([lifecycle])
+  @@index([reservationExpiresAt])
+  @@index([paymentStatus])
+  @@index([productId])
+  @@index([email, lifecycle, paymentStatus, createdAt])
+}
+
+model Manifesto {
+  id           String   @id @default(cuid())
+  content      String
+  craftContent String?
+  imageUrl     String?
+  updatedAt    DateTime @updatedAt
+}
+
+model HomeSettings {
+  id                   String   @id @default(cuid())
+  heroTitle            String   @default("SOCIÉTÉ DU VIDE")
+  heroSubtitle         String   @default("The Intellectual Approach to Form")
+  manifestoQuote       String   @default("In a world accelerating towards noise, we choose to design the silence.")
+  manifestoDescription String   // Long text
+  updatedAt            DateTime @updatedAt
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
