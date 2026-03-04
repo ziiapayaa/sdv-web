@@ -17,7 +17,7 @@ interface OrderWithProduct {
     title: string;
     slug: string;
     images: { url: string }[];
-  };
+  } | null;
 }
 
 interface AccountClientProps {
@@ -97,7 +97,7 @@ export function AccountClient({ user, orders }: AccountClientProps) {
                     <div className="flex-1 flex flex-col gap-2">
                       <div className="flex items-center gap-3">
                         <p className="text-sm tracking-wider text-[#111111] font-medium">
-                          {order.product.title}
+                          {order.product?.title || "[Deleted Product]"}
                         </p>
                         <span
                           className={`text-[9px] tracking-widest uppercase px-2 py-1 border ${getLifecycleBadge(order.lifecycle)}`}

@@ -30,7 +30,7 @@ interface OrderDetailProps {
       slug: string;
       price: number;
       images: { url: string; isPrimary: boolean }[];
-    };
+    } | null;
   };
 }
 
@@ -68,7 +68,7 @@ export function OrderDetailClient({ order }: OrderDetailProps) {
   const badge = getLifecycleBadge(order.lifecycle);
   const isFailed = ["FAILED", "EXPIRED", "REFUNDED"].includes(order.lifecycle);
   const steps = isFailed ? [] : getSteps(order.lifecycle);
-  const primaryImage = order.product.images.find(img => img.isPrimary)?.url || order.product.images[0]?.url;
+  const primaryImage = order.product?.images.find(img => img.isPrimary)?.url || order.product?.images[0]?.url;
 
   const copyOrderId = () => {
     navigator.clipboard.writeText(order.id);
@@ -148,18 +148,18 @@ export function OrderDetailClient({ order }: OrderDetailProps) {
             <div className="flex gap-5">
               {primaryImage && (
                 <div className="relative w-20 h-24 flex-shrink-0 bg-[#f0f0f0]">
-                  <Image src={primaryImage} alt={order.product.title} fill className="object-cover" sizes="80px" />
+                  <Image src={primaryImage} alt={order.product?.title || "Product"} fill className="object-cover" sizes="80px" />
                 </div>
               )}
               <div className="flex-1 flex flex-col justify-center gap-1.5">
-                <Link href={`/products/${order.product.slug}`} className="text-sm tracking-wider text-[#111111] font-medium hover:underline underline-offset-4">
-                  {order.product.title}
+                <Link href={`/products/${order.product?.slug || '#'}`} className="text-sm tracking-wider text-[#111111] font-medium hover:underline underline-offset-4">
+                  {order.product?.title || "[Deleted Product]"}
                 </Link>
                 {order.size && (
                   <p className="text-xs tracking-wider text-[#666666]">Size: <span className="font-medium">{order.size}</span></p>
                 )}
                 <p className="text-xs tracking-wider text-[#666666]">Qty: {order.quantity}</p>
-                <p className="text-xs tracking-wider text-[#666666]">{formatPrice(order.product.price)} per item</p>
+                <p className="text-xs tracking-wider text-[#666666]">{order.product ? formatPrice(order.product.price) + " per item" : ""}</p>
               </div>
             </div>
           </div>

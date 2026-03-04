@@ -110,7 +110,11 @@ export default async function AdminOrderDetailPage({ params }: OrderDetailProps)
             <tbody className="text-sm">
               <tr className="border-b border-[#e8e8e8] hover:bg-[#fafafa]">
                 <td className="py-4">
-                  <Link href={`/admin/products/${order.productId}`} className="font-medium hover:underline">{order.product.title}</Link>
+                  {order.product ? (
+                    <Link href={`/admin/products/${order.productId}`} className="font-medium hover:underline">{order.product.title}</Link>
+                  ) : (
+                    <span className="text-gray-400 italic">[Deleted Product]</span>
+                  )}
                   <div className="text-xs text-gray-400 font-mono mt-1">{order.productId}</div>
                 </td>
                 <td className="py-4 text-right">{formatMoney(order.subtotalAmount / order.quantity)}</td>
