@@ -10,19 +10,28 @@ import nodemailer from "nodemailer";
  * For dev: Use Mailtrap (https://mailtrap.io) or leave unconfigured.
  */
 
-const transporter = process.env.SMTP_HOST
-  ? nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || "587"),
-      secure: process.env.SMTP_PORT === "465",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    })
-  : null;
+// Lazy initialization — env vars are guaranteed to be available at call time
+let _transporter: nodemailer.Transporter | null = null;
 
-const FROM_EMAIL = process.env.SMTP_FROM || "no-reply@societeduvide.com";
+function getTransporter() {
+  if (_transporter) return _transporter;
+
+  if (!process.env.SMTP_HOST) return null;
+
+  _transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || "587"),
+    secure: process.env.SMTP_PORT === "465",
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  return _transporter;
+}
+
+const FROM_EMAIL = () => process.env.SMTP_FROM || "no-reply@societeduvide.com";
 const BRAND_NAME = "SOCIÉTÉ DU VIDE";
 
 function formatPrice(amount: number): string {
@@ -40,6 +49,7 @@ export async function sendOrderConfirmation(order: {
   productTitle: string;
   quantity: number;
 }) {
+  const transporter = getTransporter();
   if (!transporter) {
     console.log("[EMAIL] SMTP not configured — skipping order confirmation for", order.id);
     return;
@@ -47,7 +57,7 @@ export async function sendOrderConfirmation(order: {
 
   try {
     await transporter.sendMail({
-      from: `"${BRAND_NAME}" <${FROM_EMAIL}>`,
+      from: `"${BRAND_NAME}" <${FROM_EMAIL()}>`,
       to: order.email,
       subject: `Order Confirmed — ${BRAND_NAME}`,
       html: `
@@ -92,6 +102,7 @@ export async function sendPaymentSuccess(order: {
   totalAmount: number;
   productTitle: string;
 }) {
+  const transporter = getTransporter();
   if (!transporter) {
     console.log("[EMAIL] SMTP not configured — skipping payment success for", order.id);
     return;
@@ -99,7 +110,7 @@ export async function sendPaymentSuccess(order: {
 
   try {
     await transporter.sendMail({
-      from: `"${BRAND_NAME}" <${FROM_EMAIL}>`,
+      from: `"${BRAND_NAME}" <${FROM_EMAIL()}>`,
       to: order.email,
       subject: `Payment Received — ${BRAND_NAME}`,
       html: `
@@ -139,6 +150,7 @@ export async function sendShippingNotification(order: {
   productTitle: string;
   trackingNumber: string;
 }) {
+  const transporter = getTransporter();
   if (!transporter) {
     console.log("[EMAIL] SMTP not configured — skipping shipping notification for", order.id);
     return;
@@ -146,7 +158,7 @@ export async function sendShippingNotification(order: {
 
   try {
     await transporter.sendMail({
-      from: `"${BRAND_NAME}" <${FROM_EMAIL}>`,
+      from: `"${BRAND_NAME}" <${FROM_EMAIL()}>`,
       to: order.email,
       subject: `Your Order Has Shipped — ${BRAND_NAME}`,
       html: `
@@ -183,6 +195,7 @@ export async function sendPasswordResetEmail(data: {
   name: string;
   resetUrl: string;
 }) {
+  const transporter = getTransporter();
   if (!transporter) {
     console.log("[EMAIL] SMTP not configured — skipping password reset for", data.email);
     console.log("[EMAIL] Reset URL:", data.resetUrl);
@@ -191,7 +204,7 @@ export async function sendPasswordResetEmail(data: {
 
   try {
     await transporter.sendMail({
-      from: `"${BRAND_NAME}" <${FROM_EMAIL}>`,
+      from: `"${BRAND_NAME}" <${FROM_EMAIL()}>`,
       to: data.email,
       subject: `Password Reset — ${BRAND_NAME}`,
       html: `
