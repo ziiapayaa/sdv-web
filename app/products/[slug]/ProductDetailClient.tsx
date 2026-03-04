@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Product } from "@prisma/client";
 import { useCartStore } from "@/lib/store";
@@ -29,6 +29,17 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Mobile carousel state
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeSlide, setActiveSlide] = useState(0);
+  
+  const handleScroll = useCallback(() => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, clientWidth } = scrollRef.current;
+    const newIndex = Math.round(scrollLeft / clientWidth);
+    setActiveSlide(newIndex);
+  }, []);
 
   const showError = (msg: string) => {
     setError(msg);
@@ -123,45 +134,124 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       <div className="w-full max-w-[1200px] flex flex-col md:flex-row gap-8 md:gap-12 px-6 py-6 md:py-12">
         {/* Left Gallery */}
         <div className="w-full md:w-1/2 max-w-[650px] flex flex-col gap-4">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-            className="w-full aspect-[3/4] bg-[#f7f7f7] flex items-center justify-center text-[#666666] text-xs tracking-widest relative overflow-hidden group"
-          >
-            {mainImage ? (
-              <Image src={mainImage} alt={product.title} fill className="object-cover" priority sizes="(max-width: 768px) 100vw, 50vw" />
+          
+          {/* MOBILE: Swipeable Carousel */}
+          <div className="md:hidden">
+            {product.images.length > 0 ? (
+              <>
+                <div 
+                  ref={scrollRef}
+                  onScroll={handleScroll}
+                  className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide relative"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+                >
+                  {product.images.map((img, idx) => (
+                    <div key={idx} className="w-full flex-shrink-0 snap-center aspect-[3/4] relative bg-[#f7f7f7]">
+                      <Image 
+                        src={img.url} 
+                        alt={`${product.title} ${idx + 1}`} 
+                        fill 
+                        className="object-cover" 
+                        priority={idx === 0}
+                        sizes="100vw" 
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Dot Indicators */}
+                {product.images.length > 1 && (
+                  <div className="flex justify-center gap-2 mt-3">
+                    {product.images.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          scrollRef.current?.scrollTo({ left: idx * scrollRef.current.clientWidth, behavior: 'smooth' });
+                        }}
+                        className={`w-2 h-2 rounded-full transition-all ${activeSlide === idx ? 'bg-[#111111] scale-110' : 'bg-[#d0d0d0]'}`}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {/* Mobile Thumbnails */}
+                {product.images.length > 1 && (
+                  <div className="flex gap-3 mt-3 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+                    {product.images.map((img, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={() => {
+                          scrollRef.current?.scrollTo({ left: idx * scrollRef.current.clientWidth, behavior: 'smooth' });
+                        }}
+                        className={`w-16 aspect-[3/4] flex-shrink-0 relative bg-[#f7f7f7] transition-all ${activeSlide === idx ? 'border-2 border-[#111111]' : 'border border-transparent'}`}
+                      >
+                        <Image src={img.url} alt={`Thumbnail ${idx + 1}`} fill className="object-cover" sizes="64px" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
             ) : (
-              <span>[ NO IMAGE AVAILABLE ]</span>
+              <div className="w-full aspect-[3/4] bg-[#f7f7f7] flex items-center justify-center text-[#666666] text-xs tracking-widest">
+                [ NO IMAGE AVAILABLE ]
+              </div>
             )}
-            
-            {/* Status Overlays */}
+
+            {/* Mobile Status Overlays */}
             {isUpcoming && (
-              <div className="absolute top-4 right-4 bg-white text-black text-[10px] tracking-widest uppercase px-3 py-1 font-medium z-10">
+              <div className="mt-2 text-center text-[10px] tracking-widest uppercase text-[#666666]">
                 Dropping {formattedDropDate}
               </div>
             )}
             {isSoldOut && !isUpcoming && (
-              <div className="absolute top-4 right-4 bg-black text-white text-[10px] tracking-widest uppercase px-3 py-1 font-medium z-10">
+              <div className="mt-2 text-center text-[10px] tracking-widest uppercase text-[#999999]">
                 Archived / Sold Out
               </div>
             )}
-          </motion.div>
-          
-          {/* Thumbnails */}
-          {product.images && product.images.length > 1 && (
-            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory custom-scrollbar pb-2">
-              {product.images.map((img, idx) => (
-                <button 
-                  key={idx} 
-                  onClick={() => setMainImage(img.url)}
-                  className={`w-20 md:w-24 aspect-[3/4] flex-shrink-0 snap-start relative bg-[#f7f7f7] flex items-center justify-center transition-all ${mainImage === img.url ? 'border-2 border-[#111111]' : 'border border-transparent hover:border-[#cccccc]'}`}
-                >
-                  <Image src={img.url} alt={`${product.title} thumbnail ${idx + 1}`} fill className="object-cover" sizes="96px" />
-                </button>
-              ))}
-            </div>
-          )}
+          </div>
+
+          {/* DESKTOP: Original Gallery */}
+          <div className="hidden md:block">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="w-full aspect-[3/4] bg-[#f7f7f7] flex items-center justify-center text-[#666666] text-xs tracking-widest relative overflow-hidden group"
+            >
+              {mainImage ? (
+                <Image src={mainImage} alt={product.title} fill className="object-cover" priority sizes="50vw" />
+              ) : (
+                <span>[ NO IMAGE AVAILABLE ]</span>
+              )}
+              
+              {/* Status Overlays */}
+              {isUpcoming && (
+                <div className="absolute top-4 right-4 bg-white text-black text-[10px] tracking-widest uppercase px-3 py-1 font-medium z-10">
+                  Dropping {formattedDropDate}
+                </div>
+              )}
+              {isSoldOut && !isUpcoming && (
+                <div className="absolute top-4 right-4 bg-black text-white text-[10px] tracking-widest uppercase px-3 py-1 font-medium z-10">
+                  Archived / Sold Out
+                </div>
+              )}
+            </motion.div>
+            
+            {/* Desktop Thumbnails */}
+            {product.images && product.images.length > 1 && (
+              <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory custom-scrollbar pb-2 mt-4">
+                {product.images.map((img, idx) => (
+                  <button 
+                    key={idx} 
+                    onClick={() => setMainImage(img.url)}
+                    className={`w-24 aspect-[3/4] flex-shrink-0 snap-start relative bg-[#f7f7f7] flex items-center justify-center transition-all ${mainImage === img.url ? 'border-2 border-[#111111]' : 'border border-transparent hover:border-[#cccccc]'}`}
+                  >
+                    <Image src={img.url} alt={`${product.title} thumbnail ${idx + 1}`} fill className="object-cover" sizes="96px" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right Info Details */}
