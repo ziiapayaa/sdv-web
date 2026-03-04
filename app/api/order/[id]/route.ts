@@ -57,6 +57,10 @@ export async function POST(
       trackingNumber: order.trackingNumber,
       createdAt: order.createdAt,
       product: order.product,
+      // Include snap token for pending orders so user can resume payment
+      ...(order.paymentStatus === "UNPAID" && order.paymentIntentId 
+        ? { snapToken: order.paymentIntentId } 
+        : {}),
     });
   } catch (error) {
     console.error("Fetch Order Error:", error);

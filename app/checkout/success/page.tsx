@@ -6,8 +6,9 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { CheckCircle, Clock, Loader2 } from "lucide-react";
+import { CheckCircle, Clock, Loader2, CreditCard } from "lucide-react";
 import { CountdownTimer } from "@/components/ui/CountdownTimer";
+import Script from "next/script";
 
 import { Suspense } from "react";
 
@@ -112,6 +113,35 @@ function CheckoutSuccessContent() {
               onRefreshStatus={() => window.location.reload()} 
             />
           </div>
+        )}
+
+        {/* Pay Now Button */}
+        {isPending && orderDetails.snapToken && (
+          <>
+            <Script 
+              src="https://app.sandbox.midtrans.com/snap/snap.js"
+              data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || 'SB-Mid-client-DUMMY'}
+              strategy="afterInteractive"
+            />
+            <button
+              onClick={() => {
+                if (!(window as any).snap) {
+                  alert("Payment system is loading, please try again in a moment.");
+                  return;
+                }
+                (window as any).snap.pay(orderDetails.snapToken, {
+                  onSuccess: () => window.location.reload(),
+                  onPending: () => window.location.reload(),
+                  onError: () => alert("Payment failed. Please try again."),
+                  onClose: () => {},
+                });
+              }}
+              className="w-full sm:w-auto px-12 h-14 bg-[#000000] text-white flex items-center justify-center gap-3 text-xs tracking-[0.2em] uppercase hover:bg-[#333333] transition-colors"
+            >
+              <CreditCard className="w-4 h-4" />
+              Pay Now
+            </button>
+          </>
         )}
 
         <div className="bg-[#fcfcfc] border border-[#eaeaea] p-6 text-left my-10 space-y-4">

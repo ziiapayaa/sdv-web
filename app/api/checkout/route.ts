@@ -256,6 +256,12 @@ export async function POST(req: Request) {
 
     const transaction = await snap.createTransaction(parameter);
 
+    // Save snap token for resume-payment flow
+    await prisma.order.update({
+      where: { id: reservedOrder.id },
+      data: { paymentIntentId: transaction.token }
+    });
+
     // Send order confirmation email (non-blocking)
     sendOrderConfirmation({
       id: reservedOrder.id,
