@@ -145,7 +145,35 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
         )}
       </form>
 
-      <div className="bg-[#ffffff] border border-[#e8e8e8] overflow-x-auto">
+      {/* MOBILE: Card Layout */}
+      <div className="md:hidden flex flex-col gap-3">
+        {orders.length === 0 ? (
+          <p className="text-center text-[#666666] text-xs tracking-widest py-8">No orders found.</p>
+        ) : (
+          orders.map((order) => (
+            <Link key={order.id} href={`/admin/orders/${order.id}`} className="bg-white border border-[#e8e8e8] p-4 block hover:border-[#111111] transition-colors">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <div className="font-medium text-sm text-black">{order.id.split('-')[0].toUpperCase()}</div>
+                  <div className="text-[10px] text-[#888888] mt-0.5">{order.createdAt.toLocaleString('id-ID')}</div>
+                </div>
+                <span className="text-sm font-medium text-black">
+                  {new Intl.NumberFormat('id-ID', { style: 'currency', currency: order.currency, maximumFractionDigits: 0 }).format(order.totalAmount)}
+                </span>
+              </div>
+              <div className="text-xs text-[#666666] mb-3 truncate">{order.email}</div>
+              <div className="flex gap-2 items-center">
+                <span className={`px-2 py-0.5 text-[9px] tracking-wider uppercase border ${getBadgeColor("lifecycle", order.lifecycle)}`}>{order.lifecycle}</span>
+                <span className={`px-2 py-0.5 text-[9px] tracking-wider uppercase border ${getBadgeColor("payment", order.paymentStatus)}`}>{order.paymentStatus}</span>
+                <span className="text-[10px] text-[#999999] ml-auto">Qty: {order.quantity}</span>
+              </div>
+            </Link>
+          ))
+        )}
+      </div>
+
+      {/* DESKTOP: Table Layout */}
+      <div className="hidden md:block bg-[#ffffff] border border-[#e8e8e8] overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-[#e8e8e8] bg-[#fdfdfd]">

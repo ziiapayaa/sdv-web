@@ -95,7 +95,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           )}
         </AnimatePresence>
 
-        <div className="p-8 md:p-12">
+        <div className="p-4 md:p-12">
           {children}
         </div>
       </main>
