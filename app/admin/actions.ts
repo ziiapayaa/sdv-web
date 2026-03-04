@@ -36,28 +36,28 @@ export async function toggleProductPublish(id: string, currentStatus: boolean) {
 }
 
 export async function deleteProduct(id: string) {
-  // Prevent deletion if product has orders to protect transaction history
-  const ordersCount = await prisma.order.count({
-    where: { productId: id }
-  });
-
-  if (ordersCount > 0) {
-    throw new Error("Cannot delete product: It is referenced by existing orders. Please unpublish it instead to preserve transaction history.");
-  }
-
   // Find product and images first
   const product = await prisma.product.findUnique({
     where: { id },
     include: { images: true }
   });
 
-  if (product && product.images.length > 0) {
+  if (!product) return;
+
+  // Detach Cloudinary images (no-op for non-local URLs)
+  if (product.images.length > 0) {
     for (const img of product.images) {
       await safeDeleteFile(img.url);
     }
   }
 
-  // Explicitly delete dependent records to ensure referential integrity without relying on implicit cascading
+  // Nullify productId on existing orders to preserve transaction history
+  await prisma.order.updateMany({
+    where: { productId: id },
+    data: { productId: null }
+  });
+
+  // Explicitly delete dependent records
   await prisma.productImage.deleteMany({ where: { productId: id } });
   await prisma.productVariant.deleteMany({ where: { productId: id } });
 

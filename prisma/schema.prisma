@@ -118,8 +118,8 @@ model Order {
   phone                String
   address              String
   
-  productId            String          
-  product              Product         @relation(fields: [productId], references: [id])
+  productId            String?
+  product              Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
   quantity             Int
   size                 String?
 
