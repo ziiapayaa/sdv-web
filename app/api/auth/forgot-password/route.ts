@@ -38,8 +38,11 @@ export async function POST(req: Request) {
       },
     });
 
-    // Send email with raw token (link)
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    // Build reset URL using the actual request host (most reliable)
+    const { headers } = await import("next/headers");
+    const host = headers().get("host") || "localhost:3000";
+    const protocol = host.includes("localhost") ? "http" : "https";
+    const baseUrl = `${protocol}://${host}`;
     const resetUrl = `${baseUrl}/reset-password?token=${rawToken}&email=${encodeURIComponent(email)}`;
 
     await sendPasswordResetEmail({
