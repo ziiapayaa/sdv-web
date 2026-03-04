@@ -394,12 +394,27 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               </div>
             )}
             
-            <div className="text-sm text-[#333333] leading-relaxed font-light mb-12 space-y-4">
-              <p>{product.description}</p>
-            </div>
-
             <div className="border-t border-[#e8e8e8] pt-8 space-y-2 text-xs tracking-widest text-[#111111] uppercase flex flex-col font-medium">
               
+              {/* Description Accordion */}
+              {product.description && (
+                <div className="border-b border-[#e8e8e8] pb-2">
+                  <button onClick={() => toggleAccordion("description")} className="w-full text-left flex justify-between items-center group py-2">
+                    Description
+                    <span className="text-[#666666] group-hover:text-[#111111]">{openAccordion === "description" ? "-" : "+"}</span>
+                  </button>
+                  <AnimatePresence>
+                    {openAccordion === "description" && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                        <div className="py-4 text-[#666666] font-light normal-case tracking-normal text-sm leading-relaxed">
+                          <p>{product.description}</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+
               <div className="border-b border-[#e8e8e8] pb-2">
                 <button onClick={() => toggleAccordion("details")} className="w-full text-left flex justify-between items-center group py-2">
                   Details & Care
