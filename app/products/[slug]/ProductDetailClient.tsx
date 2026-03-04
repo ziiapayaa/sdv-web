@@ -189,7 +189,12 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 <button className="text-[10px] text-[#666666] tracking-widest underline underline-offset-4 hover:text-[#111111]">Size Guide</button>
               </div>
               <div className="flex gap-3">
-                {product.variants.map((variant) => {
+                {[...product.variants]
+                  .sort((a, b) => {
+                    const order = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'];
+                    return (order.indexOf(a.size) === -1 ? 99 : order.indexOf(a.size)) - (order.indexOf(b.size) === -1 ? 99 : order.indexOf(b.size));
+                  })
+                  .map((variant) => {
                   const outOfStock = variant.stock <= 0;
                   return (
                     <button 
