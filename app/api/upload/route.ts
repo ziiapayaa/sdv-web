@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(request: Request) {
   try {
@@ -29,24 +33,21 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create directory if not exists
-    const uploadDir = join(process.cwd(), `public/uploads/${folder}`);
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
+    // Upload to Cloudinary using upload_stream
+    const uploadResult = await new Promise<{ secure_url: string }>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: `sdv/${folder}` },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result as any);
+        }
+      );
+      uploadStream.end(buffer);
+    });
 
-    // Generate unique filename
-    const timestamp = Date.now();
-    const extension = file.name.split(".").pop();
-    const filename = `${productId}-${timestamp}.${extension}`;
-    const filePath = join(uploadDir, filename);
-
-    // Save file
-    await writeFile(filePath, buffer);
-
-    // Return the relative URL
+    // Return the absolute Cloudinary URL
     return NextResponse.json({ 
-      url: `/uploads/${folder}/${filename}`,
+      url: uploadResult.secure_url,
       success: true 
     });
   } catch (error) {

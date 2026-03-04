@@ -36,6 +36,15 @@ export async function toggleProductPublish(id: string, currentStatus: boolean) {
 }
 
 export async function deleteProduct(id: string) {
+  // Prevent deletion if product has orders to protect transaction history
+  const ordersCount = await prisma.order.count({
+    where: { productId: id }
+  });
+
+  if (ordersCount > 0) {
+    throw new Error("Cannot delete product: It is referenced by existing orders. Please unpublish it instead to preserve transaction history.");
+  }
+
   // Find product and images first
   const product = await prisma.product.findUnique({
     where: { id },
@@ -48,6 +57,11 @@ export async function deleteProduct(id: string) {
     }
   }
 
+  // Explicitly delete dependent records to ensure referential integrity without relying on implicit cascading
+  await prisma.productImage.deleteMany({ where: { productId: id } });
+  await prisma.productVariant.deleteMany({ where: { productId: id } });
+
+  // Then delete the product itself
   await prisma.product.delete({
     where: { id },
   });
