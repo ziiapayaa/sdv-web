@@ -17,21 +17,33 @@ export function HomeClient({ settings }: { settings: HomeSettings | null }) {
       <main className="min-h-screen bg-background text-foreground flex flex-col relative w-full overflow-hidden">
 
       {/* Hero Section */}
-      <section className="h-screen w-full flex flex-col items-center justify-center relative bg-white">
+      <section className="h-screen w-full flex flex-col items-center justify-center relative bg-black overflow-hidden">
+        {/* Ambient Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover z-0 opacity-70"
+          src="https://cdn.pixabay.com/video/2020/05/26/40242-424754751_large.mp4" 
+        />
+        {/* Dark Overlay for Text Legibility */}
+        <div className="absolute inset-0 bg-black/30 z-0" />
+
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-          className="z-10 text-center"
+          className="z-10 text-center px-4"
         >
-          <h1 className="text-4xl md:text-7xl lg:text-8xl tracking-[0.3em] font-light uppercase text-black">
+          <h1 className="text-4xl md:text-7xl lg:text-8xl tracking-[0.3em] font-light uppercase text-white drop-shadow-sm">
             {title}
           </h1>
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1, duration: 1.5 }}
-            className="mt-8 text-xs md:text-sm tracking-widest text-[#333333] uppercase"
+            className="mt-8 text-xs md:text-sm tracking-widest text-gray-200 uppercase drop-shadow-sm"
           >
             {subtitle}
           </motion.p>
