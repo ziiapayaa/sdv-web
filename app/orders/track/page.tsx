@@ -186,30 +186,17 @@ export default function TrackOrderPage() {
                     <h3 className="text-[10px] tracking-[0.2em] uppercase text-[#666666] mb-6">Order Progress</h3>
                     
                     {/* Desktop Timeline */}
-                    <div className="hidden sm:block">
-                      <div className="flex items-center justify-between relative px-4">
-                        {/* 
-                          Progress Line Container:
-                          The steps use flex-between inside a container with px-4.
-                          Each circle is w-8 (32px), so its center is 16px from the edge of the flex item.
-                          To draw a line exactly from the first circle's center to the last circle's center,
-                          we position the line absolute with left: 16px (half the circle) + 16px (the px-4 padding) = 32px (left-8).
-                          Same for right.
-                        */}
-                        <div className="absolute top-4 left-8 right-8 h-[2px] bg-[#e8e8e8] z-0">
-                          {/* Active Line */}
-                          <div
-                            className="absolute top-0 left-0 h-full bg-[#111111] transition-all duration-700 z-0"
-                            style={{ width: currentStepIdx > 0 ? `${(currentStepIdx / (TIMELINE_STEPS.length - 1)) * 100}%` : '0%' }}
-                          />
-                        </div>
-
-                        {TIMELINE_STEPS.map((step, idx) => {
-                          const StepIcon = step.icon;
-                          const isActive = idx <= currentStepIdx;
-                          const isCurrent = idx === currentStepIdx;
-                          return (
-                            <div key={step.key} className="flex flex-col items-center z-10 relative">
+                    <div className="hidden sm:flex items-center justify-between w-full">
+                      {TIMELINE_STEPS.map((step, idx) => {
+                        const StepIcon = step.icon;
+                        const isActive = idx <= currentStepIdx;
+                        const isCurrent = idx === currentStepIdx;
+                        const isLast = idx === TIMELINE_STEPS.length - 1;
+                        
+                        return (
+                          <React.Fragment key={step.key}>
+                            {/* Step Circle & Label */}
+                            <div className="flex flex-col items-center relative z-10 w-24">
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 ${
                                 isCurrent ? 'bg-[#111111] text-white ring-4 ring-[#111111]/10' 
                                 : isActive ? 'bg-[#111111] text-white' 
@@ -217,16 +204,28 @@ export default function TrackOrderPage() {
                               }`}>
                                 <StepIcon className="w-3.5 h-3.5" />
                               </div>
-                              <span className={`text-[9px] tracking-widest uppercase mt-2 text-center leading-tight ${
+                              <span className={`text-[9px] tracking-widest uppercase mt-3 text-center leading-tight absolute top-8 w-24 ${
                                 isActive ? 'text-[#111111] font-medium' : 'text-[#aaa]'
                               }`}>
                                 {step.label}
                               </span>
                             </div>
-                          );
-                        })}
-                      </div>
+
+                            {/* Connecting Line (drawn between circles) */}
+                            {!isLast && (
+                              <div className="flex-1 h-[2px] mx-2 relative bg-[#e8e8e8]">
+                                <div 
+                                  className="absolute top-0 left-0 h-full bg-[#111111] transition-all duration-700"
+                                  style={{ width: currentStepIdx > idx ? '100%' : '0%' }}
+                                />
+                              </div>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
                     </div>
+                    {/* Add spacer since absolute text was used */}
+                    <div className="hidden sm:block h-10 w-full" />
 
                     {/* Mobile Timeline (Vertical) */}
                     <div className="sm:hidden flex flex-col gap-0">
