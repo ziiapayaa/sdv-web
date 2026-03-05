@@ -32,18 +32,18 @@ export async function POST(req: Request) {
     });
 
     if (!resetToken) {
-      return NextResponse.json({ error: "Token tidak valid atau sudah digunakan." }, { status: 400 });
+      return NextResponse.json({ error: "Invalid or already used token." }, { status: 400 });
     }
 
     // Check expiry
     if (resetToken.expiresAt < new Date()) {
       await prisma.passwordResetToken.delete({ where: { id: resetToken.id } });
-      return NextResponse.json({ error: "Token sudah expired. Silakan minta reset ulang." }, { status: 400 });
+      return NextResponse.json({ error: "Token has expired. Please request a new password reset." }, { status: 400 });
     }
 
     // Check email matches
     if (resetToken.email !== cleanEmail) {
-      return NextResponse.json({ error: "Token tidak valid." }, { status: 400 });
+      return NextResponse.json({ error: "Invalid token." }, { status: 400 });
     }
 
     // Hash new password and update user
@@ -57,9 +57,9 @@ export async function POST(req: Request) {
     // Delete the used token
     await prisma.passwordResetToken.delete({ where: { id: resetToken.id } });
 
-    return NextResponse.json({ message: "Password berhasil direset. Silakan login." });
+    return NextResponse.json({ message: "Password has been reset successfully. Please login." });
   } catch (error) {
     console.error("[RESET-PASSWORD]", error);
-    return NextResponse.json({ error: "Terjadi kesalahan. Coba lagi." }, { status: 500 });
+    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }

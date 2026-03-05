@@ -40,7 +40,7 @@ function LoginFormContext() {
         router.refresh();
       }
     } catch {
-      setError("Terjadi kesalahan. Coba lagi.");
+      setError("Something went wrong. Please try again.");
       setLoading(false);
     }
   };

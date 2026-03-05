@@ -36,11 +36,11 @@ interface OrderDetailProps {
 
 function getLifecycleBadge(lifecycle: string) {
   const map: Record<string, { color: string; label: string }> = {
-    RESERVED: { color: "bg-yellow-50 text-yellow-700 border-yellow-200", label: "Menunggu Pembayaran" },
-    PAID: { color: "bg-green-50 text-green-700 border-green-200", label: "Dibayar" },
-    SHIPPED: { color: "bg-blue-50 text-blue-700 border-blue-200", label: "Dikirim" },
-    COMPLETED: { color: "bg-emerald-50 text-emerald-700 border-emerald-200", label: "Selesai" },
-    FAILED: { color: "bg-red-50 text-red-700 border-red-200", label: "Gagal" },
+    RESERVED: { color: "bg-yellow-50 text-yellow-700 border-yellow-200", label: "Awaiting Payment" },
+    PAID: { color: "bg-green-50 text-green-700 border-green-200", label: "Paid" },
+    SHIPPED: { color: "bg-blue-50 text-blue-700 border-blue-200", label: "Shipped" },
+    COMPLETED: { color: "bg-emerald-50 text-emerald-700 border-emerald-200", label: "Completed" },
+    FAILED: { color: "bg-red-50 text-red-700 border-red-200", label: "Failed" },
     EXPIRED: { color: "bg-gray-50 text-gray-500 border-gray-200", label: "Expired" },
     REFUNDED: { color: "bg-purple-50 text-purple-700 border-purple-200", label: "Refund" },
   };

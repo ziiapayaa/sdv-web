@@ -52,7 +52,7 @@ export default function RegisterPage() {
         router.push("/login");
       }
     } catch {
-      setError("Terjadi kesalahan. Coba lagi.");
+      setError("Something went wrong. Please try again.");
       setLoading(false);
     }
   };

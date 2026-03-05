@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
     if (!email || !isValidEmail(email)) {
       // Don't reveal whether email exists — always return success
-      return NextResponse.json({ message: "Jika email terdaftar, link reset password telah dikirim." });
+      return NextResponse.json({ message: "If the email is registered, a password reset link has been sent." });
     }
 
     // Check if user exists
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     
     if (!user) {
       // Don't reveal — return same success message
-      return NextResponse.json({ message: "Jika email terdaftar, link reset password telah dikirim." });
+      return NextResponse.json({ message: "If the email is registered, a password reset link has been sent." });
     }
 
     // Delete any existing token for this email
@@ -51,9 +51,9 @@ export async function POST(req: Request) {
       resetUrl,
     });
 
-    return NextResponse.json({ message: "Jika email terdaftar, link reset password telah dikirim." });
+    return NextResponse.json({ message: "If the email is registered, a password reset link has been sent." });
   } catch (error) {
     console.error("[FORGOT-PASSWORD]", error);
-    return NextResponse.json({ error: "Terjadi kesalahan. Coba lagi." }, { status: 500 });
+    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }

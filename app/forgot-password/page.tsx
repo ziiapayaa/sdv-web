@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
 
       setSent(true);
     } catch {
-      setError("Terjadi kesalahan. Coba lagi.");
+      setError("Something went wrong. Please try again.");
       setLoading(false);
     }
   };
@@ -62,10 +62,10 @@ export default function ForgotPasswordPage() {
             <div className="text-center">
               <div className="bg-green-50 border border-green-200 p-6 mb-6">
                 <p className="text-sm tracking-wider text-green-700">
-                  Jika email terdaftar, link reset password telah dikirim ke <strong>{email}</strong>.
+                  If the email is registered, a password reset link has been sent to <strong>{email}</strong>.
                 </p>
                 <p className="text-xs tracking-wider text-green-600 mt-3">
-                  Cek inbox dan folder spam. Link berlaku 1 jam.
+                  Check your inbox and spam folder. The link is valid for 1 hour.
                 </p>
               </div>
               <Link

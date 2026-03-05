@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     const cleanEmail = sanitizeString(email).toLowerCase();
 
     if (!isValidEmail(cleanEmail)) {
-      return NextResponse.json({ error: "Format email tidak valid." }, { status: 400 });
+      return NextResponse.json({ error: "Invalid email format." }, { status: 400 });
     }
 
     if (cleanName.length < 2 || cleanName.length > 100) {
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     });
 
     if (existing) {
-      return NextResponse.json({ error: "Email sudah terdaftar." }, { status: 409 });
+      return NextResponse.json({ error: "Email is already registered." }, { status: 409 });
     }
 
     // 3. Hash password & create user
@@ -54,12 +54,12 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({
-      message: "Akun berhasil dibuat.",
+      message: "Account created successfully.",
       user: { id: user.id, email: user.email, name: user.name },
     }, { status: 201 });
 
   } catch (error) {
     console.error("[REGISTER]", error);
-    return NextResponse.json({ error: "Terjadi kesalahan. Coba lagi." }, { status: 500 });
+    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }

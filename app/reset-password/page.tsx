@@ -41,7 +41,7 @@ function ResetPasswordForm() {
       setSuccess(true);
       setTimeout(() => router.push("/login"), 3000);
     } catch {
-      setError("Terjadi kesalahan. Coba lagi.");
+      setError("Something went wrong. Please try again.");
       setLoading(false);
     }
   };
@@ -50,7 +50,7 @@ function ResetPasswordForm() {
     return (
       <div className="text-center">
         <p className="text-sm tracking-wider text-red-500 mb-6">
-          Link reset tidak valid. Silakan minta reset ulang.
+          Invalid reset link. Please request a new password reset.
         </p>
         <Link
           href="/forgot-password"
@@ -78,7 +78,7 @@ function ResetPasswordForm() {
         <div className="text-center">
           <div className="bg-green-50 border border-green-200 p-6 mb-6">
             <p className="text-sm tracking-wider text-green-700">
-              Password berhasil direset! Redirecting ke login...
+              Password reset successful! Redirecting to login...
             </p>
           </div>
         </div>
