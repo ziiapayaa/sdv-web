@@ -2,9 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { sanitizeString, isValidEmail } from "@/lib/validation";
+import { checkRateLimitRedis } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get("x-forwarded-for") || "unknown-register";
+    const rateLimit = await checkRateLimitRedis(`register:${ip}`);
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: rateLimit.reason }, { status: 429 });
+    }
+
     const body = await req.json();
     const { name, email, password, confirmPassword } = body;
 

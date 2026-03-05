@@ -7,7 +7,7 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // --- ADMIN ROUTES: require ADMIN role ---
-  if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
+  if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin") || pathname.startsWith("/api/upload")) {
     // Skip /admin/login (public)
     if (pathname === "/admin/login") return NextResponse.next();
 
@@ -45,6 +45,7 @@ export const config = {
     "/admin",
     "/admin/(.*)",
     "/api/admin/:path*",
+    "/api/upload",
     "/checkout",
     "/account",
   ],

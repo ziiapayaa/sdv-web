@@ -3,9 +3,16 @@ import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { isValidEmail, sanitizeString } from "@/lib/validation";
+import { checkRateLimitRedis } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get("x-forwarded-for") || "unknown-forgot";
+    const rateLimit = await checkRateLimitRedis(`forgot:${ip}`);
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+    }
+
     const body = await req.json();
     const email = sanitizeString(body.email || "").toLowerCase();
 
