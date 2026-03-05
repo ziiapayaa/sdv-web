@@ -188,11 +188,18 @@ export default function TrackOrderPage() {
                     {/* Desktop Timeline */}
                     <div className="hidden sm:block">
                       <div className="flex items-center justify-between relative px-4">
-                        {/* Progress Line Container (spans exactly from center of first dot to center of last dot) */}
-                        <div className="absolute top-4 left-8 right-8 h-[2px] bg-[#e8e8e8]">
-                          {/* Active Line (now naturally scales based on container width) */}
+                        {/* 
+                          Progress Line Container:
+                          The steps use flex-between inside a container with px-4.
+                          Each circle is w-8 (32px), so its center is 16px from the edge of the flex item.
+                          To draw a line exactly from the first circle's center to the last circle's center,
+                          we position the line absolute with left: 16px (half the circle) + 16px (the px-4 padding) = 32px (left-8).
+                          Same for right.
+                        */}
+                        <div className="absolute top-4 left-8 right-8 h-[2px] bg-[#e8e8e8] z-0">
+                          {/* Active Line */}
                           <div
-                            className="absolute top-0 left-0 h-full bg-[#111111] transition-all duration-700"
+                            className="absolute top-0 left-0 h-full bg-[#111111] transition-all duration-700 z-0"
                             style={{ width: currentStepIdx > 0 ? `${(currentStepIdx / (TIMELINE_STEPS.length - 1)) * 100}%` : '0%' }}
                           />
                         </div>
