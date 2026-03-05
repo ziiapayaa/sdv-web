@@ -187,12 +187,13 @@ export default function TrackOrderPage() {
                     
                     {/* Desktop Timeline */}
                     <div className="hidden sm:block">
-                      <div className="flex items-center justify-between relative">
-                        {/* Progress Line */}
+                      <div className="flex items-center justify-between relative px-4">
+                        {/* Background Line (center of first dot to center of last dot) */}
                         <div className="absolute top-4 left-4 right-4 h-[2px] bg-[#e8e8e8]" />
+                        {/* Active Line */}
                         <div
                           className="absolute top-4 left-4 h-[2px] bg-[#111111] transition-all duration-700"
-                          style={{ width: `${currentStepIdx >= 0 ? (currentStepIdx / (TIMELINE_STEPS.length - 1)) * (100 - 6) : 0}%` }}
+                          style={{ width: currentStepIdx > 0 ? `${(currentStepIdx / (TIMELINE_STEPS.length - 1)) * 100}%` : '0%' }}
                         />
 
                         {TIMELINE_STEPS.map((step, idx) => {
