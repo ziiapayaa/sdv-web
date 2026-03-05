@@ -30,16 +30,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Validate size (3MB max)
-    const MAX_SIZE = 3 * 1024 * 1024;
+    // Validate size (15MB max for videos)
+    const MAX_SIZE = 15 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-      return NextResponse.json({ error: "File size exceeds 3MB limit" }, { status: 400 });
+      return NextResponse.json({ error: "File size exceeds 15MB limit" }, { status: 400 });
     }
 
-    // Validate type (jpg, png, webp)
-    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+    // Validate type (jpg, png, webp, mp4, webm)
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm"];
     if (!validTypes.includes(file.type)) {
-      return NextResponse.json({ error: "Invalid file type. Only JPG, PNG, and WebP are allowed." }, { status: 400 });
+      return NextResponse.json({ error: "Invalid file type. Only JPG, PNG, WebP, MP4, and WebM are allowed." }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
 
     const uploadResult = await cloudinary.uploader.upload(dataUri, {
       folder: `sdv/${folder}`,
-      resource_type: "image",
+      resource_type: "auto", // Supports both image and video
     });
 
     // Return the absolute Cloudinary URL

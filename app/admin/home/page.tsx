@@ -13,6 +13,8 @@ export default function HomeSettingsPage() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   useEffect(() => {
     fetchHomeSettings();
@@ -43,6 +45,37 @@ export default function HomeSettingsPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'video' | 'image') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const isVideo = type === 'video';
+    const setUploading = isVideo ? setIsUploadingVideo : setIsUploadingImage;
+    const key = isVideo ? 'heroVideoUrl' : 'heroImageUrl';
+
+    setUploading(true);
+    try {
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+      uploadData.append("folder", "home");
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      setFormData((prev) => ({ ...prev, [key]: data.url }));
+    } catch (error: any) {
+      console.error(error);
+      alert(`Upload failed: ${error.message}`);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -115,7 +148,18 @@ export default function HomeSettingsPage() {
             />
           </div>
           <div className="flex flex-col gap-4">
-            <label className="text-xs tracking-widest font-medium text-[#111111] uppercase">Hero Video URL</label>
+            <label className="text-xs tracking-widest font-medium text-[#111111] uppercase border-b border-[#e8e8e8] pb-2">Hero Video</label>
+            <div className="flex flex-col gap-2">
+              <input 
+                type="file" 
+                accept="video/mp4,video/webm" 
+                onChange={(e) => handleUpload(e, 'video')}
+                disabled={isUploadingVideo}
+                className="text-xs"
+              />
+              {isUploadingVideo && <p className="text-[10px] text-blue-600 animate-pulse">Uploading video (this may take a moment)...</p>}
+            </div>
+            <p className="text-[10px] text-[#666666]">OR enter URL directly:</p>
             <input 
               type="url"
               name="heroVideoUrl"
@@ -124,10 +168,22 @@ export default function HomeSettingsPage() {
               className="w-full border border-[#e8e8e8] p-4 text-sm focus:outline-none focus:border-[#111111]"
               placeholder="e.g. https://cdn.pixabay.com/video/...mp4"
             />
-            <span className="text-[10px] text-[#666666]">If provided, this video will autoplay in the background.</span>
+            <span className="text-[10px] text-[#666666]">If provided, this video will autoplay in the background. Max 15MB.</span>
           </div>
+          
           <div className="flex flex-col gap-4">
-            <label className="text-xs tracking-widest font-medium text-[#111111] uppercase">Hero Image URL (Fallback)</label>
+            <label className="text-xs tracking-widest font-medium text-[#111111] uppercase border-b border-[#e8e8e8] pb-2">Hero Image (Fallback)</label>
+            <div className="flex flex-col gap-2">
+              <input 
+                type="file" 
+                accept="image/jpeg,image/png,image/webp" 
+                onChange={(e) => handleUpload(e, 'image')}
+                disabled={isUploadingImage}
+                className="text-xs"
+              />
+              {isUploadingImage && <p className="text-[10px] text-blue-600 animate-pulse">Uploading image...</p>}
+            </div>
+            <p className="text-[10px] text-[#666666]">OR enter URL directly:</p>
             <input 
               type="url"
               name="heroImageUrl"
