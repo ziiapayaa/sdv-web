@@ -57,19 +57,33 @@ export default function HomeSettingsPage() {
 
     setUploading(true);
     try {
+      // 1. Get upload signature from our backend
+      const sigRes = await fetch("/api/upload/signature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folder: "home" })
+      });
+      const sigData = await sigRes.json();
+      
+      if (!sigRes.ok) throw new Error(sigData.error || "Failed to get upload signature");
+
+      // 2. Upload directly from browser to Cloudinary
       const uploadData = new FormData();
       uploadData.append("file", file);
-      uploadData.append("folder", "home");
+      uploadData.append("api_key", sigData.apiKey);
+      uploadData.append("timestamp", sigData.timestamp.toString());
+      uploadData.append("signature", sigData.signature);
+      uploadData.append("folder", sigData.folder);
 
-      const res = await fetch("/api/upload", {
+      const cloudinaryRes = await fetch(`https://api.cloudinary.com/v1_1/${sigData.cloudName}/auto/upload`, {
         method: "POST",
         body: uploadData,
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
+      const cloudinaryData = await cloudinaryRes.json();
+      if (!cloudinaryRes.ok) throw new Error(cloudinaryData.error?.message || "Cloudinary upload failed");
 
-      setFormData((prev) => ({ ...prev, [key]: data.url }));
+      setFormData((prev) => ({ ...prev, [key]: cloudinaryData.secure_url }));
     } catch (error: any) {
       console.error(error);
       alert(`Upload failed: ${error.message}`);
