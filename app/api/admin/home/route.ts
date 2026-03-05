@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-guard";
+import { deleteFromCloudinary } from "@/lib/cloudinary";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +38,14 @@ export async function PUT(req: Request) {
 
     let settings;
     if (existing) {
+      // Automatic cleanup: Delete old media from Cloudinary if the URL was changed
+      if (existing.heroVideoUrl && existing.heroVideoUrl !== heroVideoUrl) {
+        await deleteFromCloudinary(existing.heroVideoUrl);
+      }
+      if (existing.heroImageUrl && existing.heroImageUrl !== heroImageUrl) {
+        await deleteFromCloudinary(existing.heroImageUrl);
+      }
+
       settings = await prisma.homeSettings.update({
         where: { id: existing.id },
         data: { heroTitle, heroSubtitle, heroVideoUrl, heroImageUrl, manifestoQuote, manifestoDescription },

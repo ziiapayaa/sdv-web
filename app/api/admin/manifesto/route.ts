@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-guard";
+import { deleteFromCloudinary } from "@/lib/cloudinary";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,10 @@ export async function PUT(req: Request) {
 
     let manifesto;
     if (existing) {
+      if (existing.imageUrl && existing.imageUrl !== imageUrl) {
+        await deleteFromCloudinary(existing.imageUrl);
+      }
+
       manifesto = await prisma.manifesto.update({
         where: { id: existing.id },
         data: { content, craftContent, imageUrl },
