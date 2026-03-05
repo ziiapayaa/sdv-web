@@ -57,6 +57,8 @@ export async function POST(
       trackingNumber: order.trackingNumber,
       createdAt: order.createdAt,
       product: order.product,
+      size: order.size,
+      quantity: order.quantity,
       // Include snap token for pending orders so user can resume payment
       ...(order.paymentStatus === "UNPAID" && order.paymentIntentId 
         ? { snapToken: order.paymentIntentId } 
