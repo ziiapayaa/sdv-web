@@ -197,9 +197,8 @@ export function Navbar() {
                 <Link
                   href={isLoggedIn ? "/account" : "/login"}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-xl tracking-[0.15em] font-light uppercase group w-fit flex items-center gap-3"
+                  className="text-xl tracking-[0.15em] font-light uppercase group w-fit"
                 >
-                  <User className="w-5 h-5" strokeWidth={1.5} />
                   <span className={`transition-colors duration-200 ${
                     pathname === "/account" ? "text-[#111111] font-medium" : "text-[#666666] group-hover:text-[#111111]"
                   }`}>
