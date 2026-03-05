@@ -54,11 +54,15 @@ export default function HomeSettingsPage() {
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) throw new Error("Failed to save");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.details || `Failed with status ${res.status}`);
+      }
+      
       alert("Home Settings updated successfully!");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("Failed to save home settings data");
+      alert(`Error saving: ${error.message}`);
     } finally {
       setIsSaving(false);
     }

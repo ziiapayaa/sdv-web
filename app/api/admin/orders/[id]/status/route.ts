@@ -7,7 +7,7 @@ import { sendShippingNotification } from "@/lib/email";
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   // SECURITY: Server-side admin auth check
-  const denied = await requireAdmin();
+  const denied = await requireAdmin(req);
   if (denied) return denied;
 
   try {

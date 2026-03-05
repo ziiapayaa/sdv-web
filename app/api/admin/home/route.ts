@@ -24,7 +24,7 @@ export async function GET() {
 
 export async function PUT(req: Request) {
   // SECURITY: Server-side admin auth check
-  const denied = await requireAdmin();
+  const denied = await requireAdmin(req);
   if (denied) return denied;
 
   try {
@@ -48,6 +48,9 @@ export async function PUT(req: Request) {
     return NextResponse.json(settings);
   } catch (error) {
     console.error("PUT HomeSettings Error:", error);
-    return NextResponse.json({ error: "Failed to update home settings" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update home settings", details: error instanceof Error ? error.message : String(error) }, 
+      { status: 500 }
+    );
   }
 }
