@@ -160,6 +160,8 @@ model HomeSettings {
   id                   String   @id @default(cuid())
   heroTitle            String   @default("SOCIÉTÉ DU VIDE")
   heroSubtitle         String   @default("The Intellectual Approach to Form")
+  heroVideoUrl         String?  // Optional video background
+  heroImageUrl         String?  // Optional image background
   manifestoQuote       String   @default("In a world accelerating towards noise, we choose to design the silence.")
   manifestoDescription String   // Long text
   updatedAt            DateTime @updatedAt

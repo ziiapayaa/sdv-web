@@ -6,6 +6,8 @@ export default function HomeSettingsPage() {
   const [formData, setFormData] = useState({
     heroTitle: "",
     heroSubtitle: "",
+    heroVideoUrl: "",
+    heroImageUrl: "",
     manifestoQuote: "",
     manifestoDescription: "",
   });
@@ -25,6 +27,8 @@ export default function HomeSettingsPage() {
           setFormData({
             heroTitle: data.heroTitle || "",
             heroSubtitle: data.heroSubtitle || "",
+            heroVideoUrl: data.heroVideoUrl || "",
+            heroImageUrl: data.heroImageUrl || "",
             manifestoQuote: data.manifestoQuote || "",
             manifestoDescription: data.manifestoDescription || "",
           });
@@ -105,6 +109,30 @@ export default function HomeSettingsPage() {
               className="w-full border border-[#e8e8e8] p-4 text-sm focus:outline-none focus:border-[#111111]"
               placeholder="The Intellectual Approach to Form"
             />
+          </div>
+          <div className="flex flex-col gap-4">
+            <label className="text-xs tracking-widest font-medium text-[#111111] uppercase">Hero Video URL</label>
+            <input 
+              type="url"
+              name="heroVideoUrl"
+              value={formData.heroVideoUrl}
+              onChange={handleChange}
+              className="w-full border border-[#e8e8e8] p-4 text-sm focus:outline-none focus:border-[#111111]"
+              placeholder="e.g. https://cdn.pixabay.com/video/...mp4"
+            />
+            <span className="text-[10px] text-[#666666]">If provided, this video will autoplay in the background.</span>
+          </div>
+          <div className="flex flex-col gap-4">
+            <label className="text-xs tracking-widest font-medium text-[#111111] uppercase">Hero Image URL (Fallback)</label>
+            <input 
+              type="url"
+              name="heroImageUrl"
+              value={formData.heroImageUrl}
+              onChange={handleChange}
+              className="w-full border border-[#e8e8e8] p-4 text-sm focus:outline-none focus:border-[#111111]"
+              placeholder="e.g. https://res.cloudinary.com/...jpg"
+            />
+            <span className="text-[10px] text-[#666666]">Used if no video is provided or on mobile devices.</span>
           </div>
         </div>
 

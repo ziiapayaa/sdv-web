@@ -8,6 +8,8 @@ import { HomeSettings } from "@prisma/client";
 export function HomeClient({ settings }: { settings: HomeSettings | null }) {
   const title = settings?.heroTitle || "SOCIÉTÉ DU VIDE";
   const subtitle = settings?.heroSubtitle || "The Intellectual Approach to Form";
+  const videoUrl = settings?.heroVideoUrl || null;
+  const imageUrl = settings?.heroImageUrl || null;
   const quote = settings?.manifestoQuote || "In a world accelerating towards noise, we choose to design the silence.";
   const description = settings?.manifestoDescription || "SOCIÉTÉ DU VIDE is not merely a label, but a study in reduction. We remove the unnecessary to reveal the essential. Our garments are quiet companions for the intellectual mind—structured yet fluid, confident yet understated.";
 
@@ -18,15 +20,24 @@ export function HomeClient({ settings }: { settings: HomeSettings | null }) {
 
       {/* Hero Section */}
       <section className="h-screen w-full flex flex-col items-center justify-center relative bg-black overflow-hidden">
-        {/* Ambient Video Background */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover z-0 opacity-70"
-          src="https://cdn.pixabay.com/video/2020/05/26/40242-424754751_large.mp4" 
-        />
+        {/* Ambient Video or Image Background */}
+        {videoUrl ? (
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover z-0 opacity-70"
+            src={videoUrl} 
+          />
+        ) : imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt="Hero Background" 
+            className="absolute inset-0 w-full h-full object-cover z-0 opacity-70"
+          />
+        ) : null}
+        
         {/* Dark Overlay for Text Legibility */}
         <div className="absolute inset-0 bg-black/30 z-0" />
 

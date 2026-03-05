@@ -29,7 +29,7 @@ export async function PUT(req: Request) {
 
   try {
     const data = await req.json();
-    const { heroTitle, heroSubtitle, manifestoQuote, manifestoDescription } = data;
+    const { heroTitle, heroSubtitle, heroVideoUrl, heroImageUrl, manifestoQuote, manifestoDescription } = data;
 
     const existing = await prisma.homeSettings.findFirst();
 
@@ -37,11 +37,11 @@ export async function PUT(req: Request) {
     if (existing) {
       settings = await prisma.homeSettings.update({
         where: { id: existing.id },
-        data: { heroTitle, heroSubtitle, manifestoQuote, manifestoDescription },
+        data: { heroTitle, heroSubtitle, heroVideoUrl, heroImageUrl, manifestoQuote, manifestoDescription },
       });
     } else {
       settings = await prisma.homeSettings.create({
-        data: { heroTitle, heroSubtitle, manifestoQuote, manifestoDescription },
+        data: { heroTitle, heroSubtitle, heroVideoUrl, heroImageUrl, manifestoQuote, manifestoDescription },
       });
     }
 
