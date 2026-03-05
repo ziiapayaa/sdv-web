@@ -3,6 +3,9 @@ import { v2 as cloudinary } from "cloudinary";
 
 export const dynamic = "force-dynamic";
 
+// Allow processing up to 60 seconds (Vercel max for Hobby)
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
   try {
     // Configure Cloudinary INSIDE the handler to guarantee env vars are available
