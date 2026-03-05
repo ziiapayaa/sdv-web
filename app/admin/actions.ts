@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { DropStatus } from "@prisma/client";
 import { unlink } from "fs/promises";
 import { join } from "path";
+import { deleteFromCloudinary } from "@/lib/cloudinary";
 
 // Helper to safely delete file
 async function safeDeleteFile(url: string) {
@@ -44,10 +45,14 @@ export async function deleteProduct(id: string) {
 
   if (!product) return;
 
-  // Detach Cloudinary images (no-op for non-local URLs)
+  // Detach Cloudinary and local images
   if (product.images.length > 0) {
     for (const img of product.images) {
-      await safeDeleteFile(img.url);
+      if (img.url.includes("res.cloudinary.com")) {
+        await deleteFromCloudinary(img.url);
+      } else {
+        await safeDeleteFile(img.url);
+      }
     }
   }
 
@@ -148,7 +153,11 @@ export async function upsertProduct(formData: FormData, productId?: string) {
       const imagesToDelete = existingProduct.images.filter(img => !newUrls.includes(img.url));
 
       for (const img of imagesToDelete) {
-        await safeDeleteFile(img.url);
+        if (img.url.includes("res.cloudinary.com")) {
+          await deleteFromCloudinary(img.url);
+        } else {
+          await safeDeleteFile(img.url);
+        }
       }
     }
 
